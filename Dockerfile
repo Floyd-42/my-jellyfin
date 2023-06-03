@@ -1,2 +1,1 @@
-FROM ubuntu
-CMD touch $FILE_TOUCH && ls -la
+FROM jellyfin/jellyfin

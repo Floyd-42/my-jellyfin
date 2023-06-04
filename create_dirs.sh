@@ -24,6 +24,7 @@
 
 # Root directory
 root_dir="/volume1/data"
+# root_dir="/home/floyd/projects/volume1/data"
 
 # Subdirectories
 sub_dirs=("torrents" "usenet/incomplete" "usenet/complete" "media")
@@ -46,4 +47,7 @@ do
 done
 
 
-mkdir -p /volume1/docker/appdata/{radarr,sonarr,bazarr,plex,pullio,qbittorrent}
+
+# https://github.com/TRaSH-/Guides-Synology-Templates/blob/main/templates/jellyfin.yml
+sudo mkdir -p -m=00775 /volume1/docker/appdata/{radarr,sonarr,bazarr,jellyfin,pullio,qbittorrent}
+

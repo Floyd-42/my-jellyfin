@@ -44,3 +44,6 @@ do
     mkdir -p "$root_dir/$dir"
   fi
 done
+
+
+mkdir -p /volume1/docker/appdata/{radarr,sonarr,bazarr,plex,pullio,qbittorrent}

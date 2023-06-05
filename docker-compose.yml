@@ -1,35 +1,12 @@
 version: "3.2"
 services:
 
-  # Jellyfin - https://hotio.dev/containers/jellyfin/
-  #
-  # Don't forget to create the directory, change chown command if needed (the user:group part)
-  # sudo -u docker mkdir -m=00775 /volume1/docker/appdata/jellyfin
-
-  # jellyfin:
-  #   container_name: jellyfin
-  #   image: jellyfin/jellyfin
-  #   restart: unless-stopped
-  #   logging:
-  #     driver: json-file
-  #     options:
-  #       max-file: ${DOCKERLOGGING_MAXFILE}
-  #       max-size: ${DOCKERLOGGING_MAXSIZE}
-  #   # labels:
-  #     # - org.hotio.pullio.update=${PULLIO_UPDATE}
-  #     # - org.hotio.pullio.notify=${PULLIO_NOTIFY}
-  #     # - org.hotio.pullio.discord.webhook=${PULLIO_DISCORD_WEBHOOK}
-  #   # devices:
-  #   #   - /dev/dri:/dev/dri # optional: if you have a Syno with an Intel CPU with quicksync and want hardware transcoding
-  #   # tmpfs:
-  #   #   - /transcode # optional: if you have a Syno with enough RAM, you can uncomment this line to enable transcoding in RAM.
-
   # Jellyfin
   # mkdir -p /volume1/docker/appdata/jellyfin
   jellyfin:
     image: jellyfin/jellyfin
     container_name: jellyfin
-    user: 1000:1000
+    user: ${PUID}:${PGID}
     ports:
       - 8096:8096
     volumes:
@@ -37,104 +14,84 @@ services:
       # - ./media:/media
       - ${DOCKERCONFDIR}/jellyfin:/config:rw
       - ${DOCKERSTORAGEDIR}/media:/data/media:rw
+      - ${DOCKERCONFDIR}/jellyfin_cache:/cache
     restart: 'unless-stopped'
-    # jellyfin:
-    #   image: jellyfin/jellyfin
-    #   container_name: jellyfin
-    #   user: ${PUID}:${PGID}
-    #   ports:
-    #     - 8096:8096
-    #   volumes:
-    #     - /etc/localtime:/etc/localtime:ro
-    #     # - /path/to/cache:/cache
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
       - UMASK=002
-  #   restart: 'unless-stopped'
-  # # # Radarr - https://hotio.dev/containers/radarr/
-  # #
-  # # Don't forget to create the directory, change the -u value if needed (the created user)
-  # # sudo -u docker mkdir -m=00775 /volume1/docker/appdata/radarr
 
-  # radarr:
-  #   container_name: radarr
-  #   image: cr.hotio.dev/hotio/radarr:latest
-  #   restart: unless-stopped
-  #   logging:
-  #     driver: json-file
-  #     options:
-  #       max-file: ${DOCKERLOGGING_MAXFILE}
-  #       max-size: ${DOCKERLOGGING_MAXSIZE}
-  #   labels:
-  #     - org.hotio.pullio.update=${PULLIO_UPDATE}
-  #     - org.hotio.pullio.notify=${PULLIO_NOTIFY}
-  #     - org.hotio.pullio.discord.webhook=${PULLIO_DISCORD_WEBHOOK}
-  #   ports:
-  #     - 7878:7878
-  #   environment:
-  #     - PUID=${PUID}
-  #     - PGID=${PGID}
-  #     - TZ=${TZ}
-  #   volumes:
-  #     - /etc/localtime:/etc/localtime:ro
-  #     - ${DOCKERCONFDIR}/radarr:/config
-  #     - ${DOCKERSTORAGEDIR}:/data
+  # Radarr
+  # mkdir -p /volume1/docker/appdata/radarr
 
-  # # qBittorrent - https://hub.docker.com/r/hotio/qbittorrent
-  # #
-  # # Don't forget to create the directory, change chown command if needed (the user:group part)
-  # # sudo -u docker mkdir -m=00775 /volume1/docker/appdata/qbittorrent
-  # #
-  # # If you want to use VPN follow the instructions below.
-  # # To enable VPN set "VPN_ENABLED=true" in the .env, and uncomment the 'devices' section below. If you don't want VPN enabled set "VPN_ENABLED=false"
-  # # Start the container, and in your /appdata/qbittorrent a wireguard folder will be created where you need to place your wg0.conf file you got from your VPN provider !!!
-  # # Edit the wg0.conf, change AllowedIPs to 0.0.0.0/1,128.0.0.0/1
-  # # Remove any preexisting preup or postup from your wg0.conf file.
-  # # Add this preup to your wg0 (read the instructions): https://github.com/TRaSH-/Guides-Synology-Templates/blob/main/script/PreUp.sh
-  # #
-  # # If you are getting a "Failed to open '/dev/net/tun'" error, run the commands below.
-  # # 1 - sudo curl -sL https://raw.githubusercontent.com/TRaSH-/Guides-Synology-Templates/main/script/tun.service -o "/etc/systemd/system/tun.service"
-  # # 2"- sudo systemctl enable /etc/systemd/system/tun.service
-  # # 3 - sudo systemctl start tun
-  # # Check if running with - sudo systemctl status tun
-  # # recreate the container with - sudo docker-compose up --force-recreate qbittorrent
+  radarr:
+    container_name: radarr
+    image: linuxserver/radarr
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-file: ${DOCKERLOGGING_MAXFILE}
+        max-size: ${DOCKERLOGGING_MAXSIZE}
+    ports:
+      - 7878:7878
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${DOCKERCONFDIR}/radarr:/config
+      - ${DOCKERSTORAGEDIR}:/data
 
-  # qbittorrent:
-  #   container_name: qbittorrent
-  #   image: cr.hotio.dev/hotio/qbittorrent:legacy
-  #   restart: unless-stopped
-  #   logging:
-  #     driver: json-file
-  #     options:
-  #       max-file: ${DOCKERLOGGING_MAXFILE}
-  #       max-size: ${DOCKERLOGGING_MAXSIZE}
-  #   labels:
-  #     - org.hotio.pullio.update=${PULLIO_UPDATE}
-  #     - org.hotio.pullio.notify=${PULLIO_NOTIFY}
-  #     - org.hotio.pullio.discord.webhook=${PULLIO_DISCORD_WEBHOOK}
-  #   ports:
-  #     - ${QBITTORRENT_WEBUI_PORT}:${QBITTORRENT_WEBUI_PORT}
-  #     - ${QBITTORRENT_PRIVOXY_PORT}:${QBITTORRENT_PRIVOXY_PORT}
-  #   cap_add:
-  #     - NET_ADMIN
-  #   #   devices:                              # Optional, uncomment if you use VPN
-  #   #     - /dev/net/tun:/dev/net/tun         # Optional, uncomment if you use VPN
-  #   sysctls:
-  #     - net.ipv4.conf.all.src_valid_mark=1
-  #     - net.ipv6.conf.all.disable_ipv6=1 # Optional, if you want to use ipv6, remove this line. If you keep this line, make sure there is no ipv6 in your wg0.conf.
-  #   environment:
-  #     - PUID=${PUID}
-  #     - PGID=${PGID}
-  #     - TZ=${TZ}
-  #     - UMASK=022
-  #     - VPN_ENABLED=${VPN_ENABLED}
-  #     - VPN_LAN_NETWORK=${LAN_NETWORK}
-  #     - VPN_CONF=wg0
-  #     - PRIVOXY_ENABLED=${QBITTORRENT_ENABLE_PRIVOXY}
-  #     - WEBUI_PORTS=${QBITTORRENT_WEBUI_PORT}/tcp,${QBITTORRENT_WEBUI_PORT}/udp # Optional only needed if you want to change the default 8080 WebUI port
-  #   volumes:
-  #     - /etc/localtime:/etc/localtime:ro
-  #     - ${DOCKERCONFDIR}/qbittorrent:/config:rw
-  #     - ${DOCKERSTORAGEDIR}/torrents:/data/torrents:rw
+  # qBittorrent
+
+  # Don't forget to create the directory, change chown command if needed (the user:group part)
+  # sudo -u docker mkdir -m=00775 /volume1/docker/appdata/qbittorrent
+
+  # If you want to use VPN follow the instructions below.
+  # To enable VPN set "VPN_ENABLED=true" in the .env, and uncomment the 'devices' section below. If you don't want VPN enabled set "VPN_ENABLED=false"
+  # Start the container, and in your /appdata/qbittorrent a wireguard folder will be created where you need to place your wg0.conf file you got from your VPN provider !!!
+  # Edit the wg0.conf, change AllowedIPs to 0.0.0.0/1,128.0.0.0/1
+  # Remove any preexisting preup or postup from your wg0.conf file.
+  # Add this preup to your wg0 (read the instructions): https://github.com/TRaSH-/Guides-Synology-Templates/blob/main/script/PreUp.sh
+
+  # If you are getting a "Failed to open '/dev/net/tun'" error, run the commands below.
+  # 1 - sudo curl -sL https://raw.githubusercontent.com/TRaSH-/Guides-Synology-Templates/main/script/tun.service -o "/etc/systemd/system/tun.service"
+  # 2"- sudo systemctl enable /etc/systemd/system/tun.service
+  # 3 - sudo systemctl start tun
+  # Check if running with - sudo systemctl status tun
+  # recreate the container with - sudo docker-compose up --force-recreate qbittorrent
+
+  qbittorrent:
+    container_name: qbittorrent
+    image: lscr.io/linuxserver/qbittorrent
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-file: ${DOCKERLOGGING_MAXFILE}
+        max-size: ${DOCKERLOGGING_MAXSIZE}
+    ports:
+      - ${QBITTORRENT_WEBUI_PORT}:${QBITTORRENT_WEBUI_PORT}
+      - ${QBITTORRENT_PRIVOXY_PORT}:${QBITTORRENT_PRIVOXY_PORT}
+    cap_add:
+      - NET_ADMIN
+    #   devices:                              # Optional, uncomment if you use VPN
+    #     - /dev/net/tun:/dev/net/tun         # Optional, uncomment if you use VPN
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv6.conf.all.disable_ipv6=1 # Optional, if you want to use ipv6, remove this line. If you keep this line, make sure there is no ipv6 in your wg0.conf.
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK=022
+      - VPN_ENABLED=${VPN_ENABLED}
+      - VPN_LAN_NETWORK=${LAN_NETWORK}
+      - VPN_CONF=wg0
+      - PRIVOXY_ENABLED=${QBITTORRENT_ENABLE_PRIVOXY}
+      - WEBUI_PORTS=${QBITTORRENT_WEBUI_PORT}/tcp,${QBITTORRENT_WEBUI_PORT}/udp # Optional only needed if you want to change the default 8080 WebUI port
+    volumes:
+      - ${DOCKERCONFDIR}/qbittorrent:/config:rw
+      - ${DOCKERSTORAGEDIR}/torrents:/data/torrents:rw

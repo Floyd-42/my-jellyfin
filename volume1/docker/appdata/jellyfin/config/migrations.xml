@@ -45,5 +45,9 @@
       <Item1>de009b59-baae-428d-a810-f67762dc05b8</Item1>
       <Item2>AddPeopleQueryIndex</Item2>
     </ValueTupleOfGuidString>
+    <ValueTupleOfGuidString>
+      <Item1>9b354818-94d5-4b68-ac49-e35cb85f9d84</Item1>
+      <Item2>CreateNetworkConfiguration</Item2>
+    </ValueTupleOfGuidString>
   </Applied>
 </MigrationOptions>

@@ -1,1 +1,7 @@
 .env
+volume1/docker/appdata/jellyfin/log
+volume1/docker/appdata/jellyfin/data/ScheduledTasks
+volume1/docker/appdata/qbittorrent/qBittorrent/logs
+volume1/docker/appdata/qbittorrent/qBittorrent/qBittorrent-data.conf
+volume1/docker/appdata/radarr/logs
+volume1/docker/appdata/radarr/logs*
